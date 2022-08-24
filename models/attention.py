@@ -223,8 +223,7 @@ class MultiScaleAttention(nn.Module):
 
         self.residual_pooling = residual_pooling
 
-    def forward(self, x, hw_shape):
-        return x
+#     def forward(self, x, hw_shape):
 #         B, N, _ = x.shape
 
 #         if self.pool_first:
