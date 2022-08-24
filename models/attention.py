@@ -24,7 +24,7 @@ def attention_pool(tensor, pool, hw_shape, has_cls_embed=True, norm=None):
         cls_tok, tensor = tensor[:, :, :1, :], tensor[:, :, 1:, :]
 
     B, N, L, C = tensor.shape
-    H, W = hw_shape
+    H, W = hw_shape[0], hw_shape[1]
     tensor = tensor.reshape(B * N, H, W, C).permute(0, 3, 1, 2).contiguous()
 
     tensor = pool(tensor)
