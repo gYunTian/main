@@ -11,9 +11,9 @@ import logging
 import os
 import sys
 
-import mvit.utils.distributed as du
+import main.utils.distributed as du
 import simplejson
-from mvit.utils.env import pathmgr
+from main.utils.env import pathmgr
 
 
 def _suppress_print():
