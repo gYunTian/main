@@ -5,10 +5,10 @@
 
 import os
 
-import mvit.utils.distributed as du
-import mvit.utils.logging as logging
+import main.utils.distributed as du
+import main.utils.logging as logging
 import torch
-from mvit.utils.env import checkpoint_pathmgr as pathmgr
+from main.utils.env import checkpoint_pathmgr as pathmgr
 
 logger = logging.get_logger(__name__)
 
