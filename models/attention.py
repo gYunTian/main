@@ -243,21 +243,24 @@ class MultiScaleAttention(nn.Module):
 
         q, q_shape = attention_pool(
             q,
-            self.pool_q,
+            None,
+            #self.pool_q,
             hw_shape,
             has_cls_embed=self.has_cls_embed,
             norm=self.norm_q if hasattr(self, "norm_q") else None,
         )
         k, k_shape = attention_pool(
             k,
-            self.pool_k,
+            None,
+            #self.pool_k,
             hw_shape,
             has_cls_embed=self.has_cls_embed,
             norm=self.norm_k if hasattr(self, "norm_k") else None,
         )
         v, v_shape = attention_pool(
             v,
-            self.pool_v,
+            None,
+            #self.pool_v,
             hw_shape,
             has_cls_embed=self.has_cls_embed,
             norm=self.norm_v if hasattr(self, "norm_v") else None,
@@ -381,7 +384,7 @@ class MultiScaleBlock(nn.Module):
         if self.dim_mul_in_att and self.dim != self.dim_out:
             x = self.proj(x_norm)
         x_res, _ = attention_pool(
-            x, self.pool_skip, hw_shape, has_cls_embed=self.has_cls_embed
+            x, None, hw_shape, has_cls_embed=self.has_cls_embed
         )
         x = x_res + self.drop_path(x_block)
         x_norm = self.norm2(x)
