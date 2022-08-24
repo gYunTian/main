@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) Meta Platforms, Inc. and affiliates. All Rights Reserved. All Rights Reserved.
 
-from utils.env import setup_environment
+from main.utils.env import setup_environment
 
 setup_environment()
