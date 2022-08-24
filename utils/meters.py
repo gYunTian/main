@@ -6,8 +6,8 @@
 import datetime
 from collections import deque
 
-import mvit.utils.logging as logging
-import mvit.utils.misc as misc
+import main.utils.logging as logging
+import main.utils.misc as misc
 import numpy as np
 from fvcore.common.timer import Timer
 
