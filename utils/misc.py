@@ -6,8 +6,8 @@ import math
 import os
 from datetime import datetime
 
-import mvit.utils.logging as logging
-import mvit.utils.multiprocessing as mpu
+import main.utils.logging as logging
+import main.utils.multiprocessing as mpu
 import numpy as np
 import psutil
 import torch
