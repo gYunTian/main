@@ -224,85 +224,86 @@ class MultiScaleAttention(nn.Module):
         self.residual_pooling = residual_pooling
 
     def forward(self, x, hw_shape):
-        B, N, _ = x.shape
+        return x
+#         B, N, _ = x.shape
 
-        if self.pool_first:
-            if self.mode == "conv_unshared":
-                fold_dim = 1
-            else:
-                fold_dim = self.num_heads
-            x = x.reshape(B, N, fold_dim, -1).permute(0, 2, 1, 3)
-            q = k = v = x
-        else:
-            assert self.mode != "conv_unshared"
+#         if self.pool_first:
+#             if self.mode == "conv_unshared":
+#                 fold_dim = 1
+#             else:
+#                 fold_dim = self.num_heads
+#             x = x.reshape(B, N, fold_dim, -1).permute(0, 2, 1, 3)
+#             q = k = v = x
+#         else:
+#             assert self.mode != "conv_unshared"
 
-            qkv = (
-                self.qkv(x).reshape(B, N, 3, self.num_heads, -1).permute(2, 0, 3, 1, 4)
-            )
-            q, k, v = qkv[0], qkv[1], qkv[2]
+#             qkv = (
+#                 self.qkv(x).reshape(B, N, 3, self.num_heads, -1).permute(2, 0, 3, 1, 4)
+#             )
+#             q, k, v = qkv[0], qkv[1], qkv[2]
 
-        q, q_shape = attention_pool(
-            q,
-            None,
-            #self.pool_q,
-            hw_shape,
-            has_cls_embed=self.has_cls_embed,
-            norm=self.norm_q if hasattr(self, "norm_q") else None,
-        )
-        k, k_shape = attention_pool(
-            k,
-            None,
-            #self.pool_k,
-            hw_shape,
-            has_cls_embed=self.has_cls_embed,
-            norm=self.norm_k if hasattr(self, "norm_k") else None,
-        )
-        v, v_shape = attention_pool(
-            v,
-            None,
-            #self.pool_v,
-            hw_shape,
-            has_cls_embed=self.has_cls_embed,
-            norm=self.norm_v if hasattr(self, "norm_v") else None,
-        )
+#         q, q_shape = attention_pool(
+#             q,
+#             None,
+#             #self.pool_q,
+#             hw_shape,
+#             has_cls_embed=self.has_cls_embed,
+#             norm=self.norm_q if hasattr(self, "norm_q") else None,
+#         )
+#         k, k_shape = attention_pool(
+#             k,
+#             None,
+#             #self.pool_k,
+#             hw_shape,
+#             has_cls_embed=self.has_cls_embed,
+#             norm=self.norm_k if hasattr(self, "norm_k") else None,
+#         )
+#         v, v_shape = attention_pool(
+#             v,
+#             None,
+#             #self.pool_v,
+#             hw_shape,
+#             has_cls_embed=self.has_cls_embed,
+#             norm=self.norm_v if hasattr(self, "norm_v") else None,
+#         )
 
-        if self.pool_first:
-            q_N = numpy.prod(q_shape) + 1 if self.has_cls_embed else numpy.prod(q_shape)
-            k_N = numpy.prod(k_shape) + 1 if self.has_cls_embed else numpy.prod(k_shape)
-            v_N = numpy.prod(v_shape) + 1 if self.has_cls_embed else numpy.prod(v_shape)
+#         if self.pool_first:
+#             q_N = numpy.prod(q_shape) + 1 if self.has_cls_embed else numpy.prod(q_shape)
+#             k_N = numpy.prod(k_shape) + 1 if self.has_cls_embed else numpy.prod(k_shape)
+#             v_N = numpy.prod(v_shape) + 1 if self.has_cls_embed else numpy.prod(v_shape)
 
-            q = q.permute(0, 2, 1, 3).reshape(B, q_N, -1)
-            q = self.q(q).reshape(B, q_N, self.num_heads, -1).permute(0, 2, 1, 3)
+#             q = q.permute(0, 2, 1, 3).reshape(B, q_N, -1)
+#             q = self.q(q).reshape(B, q_N, self.num_heads, -1).permute(0, 2, 1, 3)
 
-            v = v.permute(0, 2, 1, 3).reshape(B, v_N, -1)
-            v = self.v(v).reshape(B, v_N, self.num_heads, -1).permute(0, 2, 1, 3)
+#             v = v.permute(0, 2, 1, 3).reshape(B, v_N, -1)
+#             v = self.v(v).reshape(B, v_N, self.num_heads, -1).permute(0, 2, 1, 3)
 
-            k = k.permute(0, 2, 1, 3).reshape(B, k_N, -1)
-            k = self.k(k).reshape(B, k_N, self.num_heads, -1).permute(0, 2, 1, 3)
+#             k = k.permute(0, 2, 1, 3).reshape(B, k_N, -1)
+#             k = self.k(k).reshape(B, k_N, self.num_heads, -1).permute(0, 2, 1, 3)
 
-        N = q.shape[2]
-        attn = (q * self.scale) @ k.transpose(-2, -1)
-        if self.rel_pos_spatial:
-            attn = cal_rel_pos_spatial(
-                attn,
-                q,
-                self.has_cls_embed,
-                q_shape,
-                k_shape,
-                self.rel_pos_h,
-                self.rel_pos_w,
-            )
+#         N = q.shape[2]
+#         attn = (q * self.scale) @ k.transpose(-2, -1)
+#         if self.rel_pos_spatial:
+#             attn = cal_rel_pos_spatial(
+#                 attn,
+#                 q,
+#                 self.has_cls_embed,
+#                 q_shape,
+#                 k_shape,
+#                 self.rel_pos_h,
+#                 self.rel_pos_w,
+#             )
 
-        attn = attn.softmax(dim=-1)
-        x = attn @ v
+#         attn = attn.softmax(dim=-1)
+#         x = attn @ v
 
-        if self.residual_pooling:
-            x = x + q
+#         if self.residual_pooling:
+#             x = x + q
 
-        x = x.transpose(1, 2).reshape(B, -1, self.dim_out)
-        x = self.proj(x)
+#         x = x.transpose(1, 2).reshape(B, -1, self.dim_out)
+#         x = self.proj(x)
 
-        return x, q_shape
+#         return x, q_shape
 
 
 class MultiScaleBlock(nn.Module):
