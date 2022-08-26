@@ -1,6 +1,6 @@
 # Copyright (c) Meta Platforms, Inc. and affiliates. All Rights Reserved.
 
-import mvit.utils.logging as logging
+import main.utils.logging as logging
 import torch
 import torch.nn as nn
 
