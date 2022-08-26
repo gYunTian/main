@@ -36,7 +36,6 @@ class PatchEmbed(nn.Module):
         padding=(3, 3),
     ):
         super().__init__()
-        print(dim_in)
 
         self.proj = nn.Conv2d(
             in_channels=dim_in,
@@ -187,12 +186,6 @@ class MViT(nn.Module):
                     dim_mul[i + 1],
                     divisor=round_width(num_heads, head_mul[i + 1]),
                 )
-            
-            print("IDX:", i)
-            print("DIM:", embed_dim, "OUT:", dim_out, "num_heads:", num_heads, "input_size:", input_size)
-            print("kernel q:", pool_q[i] if len(pool_q) > i else [], "kernel_kv:", pool_kv[i] if len(pool_kv) > i else [])
-            print("stride_q:", stride_q[i] if len(stride_q) > i else [], "stride_kv:", stride_kv[i] if len(stride_kv) > i else [])
-            print("\n\n")
 
             attention_block = MultiScaleBlock(
                 dim=embed_dim,
@@ -260,9 +253,7 @@ class MViT(nn.Module):
         return names
 
     def forward(self, x):
-        print("Input:", x.shape)
         x, bchw = self.patch_embed(x)
-        print("PE:", x.shape)
 
         H, W = bchw[-2], bchw[-1]
         B, N, C = x.shape
@@ -273,15 +264,12 @@ class MViT(nn.Module):
 
         if self.use_abs_pos:
             x = x + self.pos_embed
-        print("CLS:", x.shape)
 
         thw = [H, W]
         for blk in self.blocks:
             x, thw = blk(x, thw)
-            print(x.shape)
 
         x = self.norm(x)
-        print("NORM:", x.shape)
 
         if self.cls_embed_on:
             x = x[:, 0]
