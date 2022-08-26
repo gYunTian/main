@@ -5,7 +5,7 @@
 import numpy
 import torch
 import torch.nn as nn
-from main.models.common import DropPath, Mlp
+from mvit.models.common import DropPath, Mlp
 from torch.nn.init import trunc_normal_
 from typing import List, Dict, Tuple
 
@@ -342,7 +342,7 @@ class MultiScaleAttention(nn.Module):
             'q',
             #self.pool_q,
             hw_shape,
-            has_cls_embed=self.has_cls_embed,
+            has_cls_embed=self.has_cls_embed[0],
             norm=True
             #norm=self.norm_q if hasattr(self, "norm_q") else None,
         )
@@ -351,7 +351,7 @@ class MultiScaleAttention(nn.Module):
             'k',
             #self.pool_k,
             hw_shape,
-            has_cls_embed=self.has_cls_embed,
+            has_cls_embed=self.has_cls_embed[0],
             norm=True
             #norm=self.norm_k if hasattr(self, "norm_k") else None,
         )
@@ -360,20 +360,20 @@ class MultiScaleAttention(nn.Module):
             'v',
             #self.pool_v,
             hw_shape,
-            has_cls_embed=self.has_cls_embed,
+            has_cls_embed=self.has_cls_embed[0],
             norm=True
             #norm=self.norm_v if hasattr(self, "norm_v") else None,
         )
 
         if self.pool_first:
             qs = torch.tensor(q_shape)
-            q_N = torch.prod(qs) + 1 if self.has_cls_embed else torch.prod(qs)
+            q_N = torch.prod(qs) + 1 if self.has_cls_embed[0] else torch.prod(qs)
             #q_N = numpy.prod(q_shape) + 1 if self.has_cls_embed else numpy.prod(q_shape)
             ks = torch.tensor(k_shape)
-            k_N = torch.prod(ks) + 1 if self.has_cls_embed else torch.prod(ks)
+            k_N = torch.prod(ks) + 1 if self.has_cls_embed[0] else torch.prod(ks)
             # k_N = numpy.prod(k_shape) + 1 if self.has_cls_embed else numpy.prod(k_shape)
             vs = torch.tensor(v_shape)
-            v_N = torch.prod(vs) + 1 if self.has_cls_embed else torch.prod(vs)
+            v_N = torch.prod(vs) + 1 if self.has_cls_embed[0] else torch.prod(vs)
             # v_N = numpy.prod(v_shape) + 1 if self.has_cls_embed else numpy.prod(v_shape)
 
             q = q.permute(0, 2, 1, 3).reshape(B, q_N, -1)
@@ -391,7 +391,7 @@ class MultiScaleAttention(nn.Module):
             attn = cal_rel_pos_spatial(
                 attn,
                 q,
-                self.has_cls_embed,
+                self.has_cls_embed[0],
                 q_shape,
                 k_shape,
                 self.rel_pos_h,
@@ -537,7 +537,7 @@ class MultiScaleBlock(nn.Module):
         #     x, self.pool_skip, hw_shape, has_cls_embed=self.has_cls_embed
         # )
         x_res, _ = self.attention_pool(
-            x, hw_shape, has_cls_embed=self.has_cls_embed
+            x, hw_shape, has_cls_embed=self.has_cls_embed[0]
         )
         x = x_res + self.drop_path(x_block)
         x_norm = self.norm2(x)
