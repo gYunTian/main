@@ -36,10 +36,11 @@ class PatchEmbed(nn.Module):
         padding=(3, 3),
     ):
         super().__init__()
+        print(dim_in)
 
         self.proj = nn.Conv2d(
-            dim_in,
-            dim_out,
+            in_channels=dim_in,
+            out_channels=dim_out,
             kernel_size=kernel,
             stride=stride,
             padding=padding,
@@ -259,7 +260,9 @@ class MViT(nn.Module):
         return names
 
     def forward(self, x):
+        print("Input:", x.shape)
         x, bchw = self.patch_embed(x)
+        print("PE:", x.shape)
 
         H, W = bchw[-2], bchw[-1]
         B, N, C = x.shape
@@ -270,18 +273,21 @@ class MViT(nn.Module):
 
         if self.use_abs_pos:
             x = x + self.pos_embed
-        
+        print("CLS:", x.shape)
+
         thw = [H, W]
         for blk in self.blocks:
             x, thw = blk(x, thw)
+            print(x.shape)
 
         x = self.norm(x)
+        print("NORM:", x.shape)
 
         if self.cls_embed_on:
             x = x[:, 0]
         else:
             x = x.mean(1)
-
+        
         x = self.head(x)
         return x
 
