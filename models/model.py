@@ -21,8 +21,7 @@ try:
     from fairscale.nn.checkpoint import checkpoint_wrapper
 except ImportError:
     checkpoint_wrapper = None
-
-
+    
 class PatchEmbed(nn.Module):
     """
     PatchEmbed.
@@ -268,10 +267,10 @@ class MViT(nn.Module):
         if self.cls_embed_on:
             cls_tokens = self.cls_token.expand(B, -1, -1)
             x = torch.cat((cls_tokens, x), dim=1)
-        
+
         if self.use_abs_pos:
             x = x + self.pos_embed
-
+        
         thw = [H, W]
         for blk in self.blocks:
             x, thw = blk(x, thw)
