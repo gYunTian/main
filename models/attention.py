@@ -9,20 +9,7 @@ from mvit.models.common import DropPath, Mlp
 from torch.nn.init import trunc_normal_
 from typing import List, Dict, Tuple
 
-class Conv(nn.Module):
-    def __init__(self, in_dim: int, out_dim: int, kernel: List[int], 
-    stride: List[int], padding: List[int], groups: int, bias: bool) -> None:
-        super().__init__()
-        print("In Conv module")
-        self.conv = nn.Conv2d(in_channels=in_dim, out_channels=out_dim, 
-        kernel_size=kernel, stride=stride, padding=padding, groups=groups, bias=bias)
-        print("created Conv")
 
-    # def forward(self, x: torch.Tensor) -> torch.Tensor:
-    #     return self.conv(x)
-
-    def __call__(self, x: torch.Tensor) -> torch.Tensor:
-        return self.conv(x)
 
 # def attention_pool(tensor: torch.Tensor, pool, hw_shape: List[int], has_cls_embed=True, norm=None):
 #     if pool is None:
@@ -84,8 +71,8 @@ def cal_rel_pos_spatial(
     Spatial Relative Positional Embeddings.
     """
     sp_idx = 1 if has_cls_embed else 0
-    print("Q shape:", q_shape)
-    print("K shape:", k_shape)
+    #print("Q shape:", q_shape)
+    #print("K shape:", k_shape)
     q_h, q_w = q_shape
     k_h, k_w = k_shape
 
@@ -540,7 +527,7 @@ class MultiScaleBlock(nn.Module):
         return tensor, hw_shape
 
     def forward(self, x, hw_shape: List[int]):
-        print("HW shape:", hw_shape)
+        # print("HW shape:", hw_shape)
         x_norm = self.norm1(x)
         x_block, hw_shape_new = self.attn(x_norm, hw_shape)
 
