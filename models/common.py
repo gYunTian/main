@@ -1,6 +1,6 @@
 # Copyright (c) Meta Platforms, Inc. and affiliates. All Rights Reserved.
 
-import main.utils.logging as logging
+import mvit.utils.logging as logging
 import torch
 import torch.nn as nn
 
@@ -23,9 +23,10 @@ class Mlp(nn.Module):
         self.fc1 = nn.Linear(in_features, hidden_features)
         self.act = act_layer()
         self.fc2 = nn.Linear(hidden_features, out_features)
+        self.drop = nn.Dropout(0.0)
         if self.drop_rate > 0.0:
             self.drop = nn.Dropout(drop_rate)
-
+        
     def forward(self, x):
         x = self.fc1(x)
         x = self.act(x)
