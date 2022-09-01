@@ -9,55 +9,6 @@ from main.models.common import DropPath, Mlp
 from torch.nn.init import trunc_normal_
 from typing import List, Dict, Tuple
 
-
-
-# def attention_pool(tensor: torch.Tensor, pool, hw_shape: List[int], has_cls_embed=True, norm=None):
-#     if pool is None:
-#         return tensor, hw_shape
-#     elif isinstance(pool, Dict):
-#         print("Found dict, IN pool:", tensor.shape)
-#         # pool = torch.nn.functional.conv2d(weight=pool['kernel'], stride=pool['stride'], padding=pool['padding'],groups=pool['groups'])
-#         print(pool)
-#         pool = nn.Conv2d(
-#             pool['dim_conv'],
-#             pool['dim_conv'],
-#             pool['kernel'],
-#             stride=pool['stride'],
-#             padding=pool['padding'],
-#             groups=pool['groups'],
-#             bias=pool['bias'],
-#             ).to("cuda:0")
-    
-#     tensor_dim = tensor.ndim
-#     if tensor_dim == 4:
-#         pass
-#     elif tensor_dim == 3:
-#         tensor = tensor.unsqueeze(1)
-#     else:
-#         raise NotImplementedError(f"Unsupported input dimension {tensor.shape}")
-
-#     if has_cls_embed:
-#         cls_tok, tensor = tensor[:, :, :1, :], tensor[:, :, 1:, :]
-
-#     B, N, L, C = tensor.shape
-#     H, W = hw_shape[0], hw_shape[1]
-#     tensor = tensor.reshape(B * N, H, W, C).permute(0, 3, 1, 2).contiguous()
-
-#     tensor = pool(tensor)
-
-#     hw_shape = [tensor.shape[2], tensor.shape[3]]
-#     L_pooled = tensor.shape[2] * tensor.shape[3]
-#     tensor = tensor.reshape(B, N, C, L_pooled).transpose(2, 3)
-#     if has_cls_embed:
-#         tensor = torch.cat((cls_tok, tensor), dim=2)
-#     if norm is not None:
-#         tensor = norm(tensor)
-
-#     if tensor_dim == 3:
-#         tensor = tensor.squeeze(1)
-#     return tensor, hw_shape
-
-
 def cal_rel_pos_spatial(
     attn: torch.Tensor,
     q: torch.Tensor,
@@ -403,6 +354,11 @@ class MultiScaleAttention(nn.Module):
 
         if self.residual_pooling:
             x = x + q
+            if self.has_cls_embed:
+                x[:, :, 1:, :] += q[:, :, 1:, :]
+            else:
+                x = x + q
+
 
         x = x.transpose(1, 2).reshape(B, -1, self.dim_out)
         x = self.proj(x)
